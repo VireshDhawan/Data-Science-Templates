@@ -1,4 +1,6 @@
 import plotly.offline as py
+
+py.init_notebook_mode(connected=True)
 import plotly.graph_objs as go
 
 
@@ -8,23 +10,31 @@ class Artists:
         pass
 
     def draw_line_continuous(self, x, y, x_alias='x_axis', y_alias='y_axis'):
-        trace = go.Scatter(
+
+        data = [go.Scatter(
             x=x,
             y=y,
             mode='lines+markers',
+        )]
+        layout = go.Layout(
+            title=x_alias + '_vs_' + y_alias + '_line',
         )
-
-        data = [trace]
-        py.plot(data, filename=x_alias + '_vs_' + y_alias + '_line.html', auto_open=True)
+        fig = go.Figure(data=data, layout=layout)
+        py.iplot(fig, filename=x_alias + '_vs_' + y_alias + '_line.html')
+        # py.plot(data, filename=x_alias + '_vs_' + y_alias + '_line.html', auto_open=True)
 
     def draw_bar_discontinuous(self, x, y, x_alias='x_axis', y_alias='y_axis'):
-        trace = go.Bar(
+        data = [go.Bar(
             x=x,
             y=y
-        )
+        )]
 
-        data = [trace]
-        py.plot(data, filename=x_alias + '_vs_' + y_alias + '_bar.html', auto_open=True)
+        layout = go.Layout(
+            title=x_alias + '_vs_' + y_alias + '_bar',
+        )
+        fig = go.Figure(data=data, layout=layout)
+        py.iplot(fig, filename=x_alias + '_vs_' + y_alias + '_bar.html')
+        # py.iplot(data, filename=x_alias + '_vs_' + y_alias + '_bar.html', auto_open=True)
 
 
 if __name__ == "__main__":
