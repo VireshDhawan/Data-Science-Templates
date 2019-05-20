@@ -1,15 +1,15 @@
 import mysql.connector
 
-mydb = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    passwd="Piku123.",
-    database="datascience"
-)
-mycursor = mydb.cursor()
 
 
 class Database:
+    mydb = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        passwd="Piku123.",
+        database="datascience"
+    )
+    mycursor = mydb.cursor()
 
     def __init__(self):
         pass
@@ -22,9 +22,9 @@ class Database:
         except:
             pass
 
-        mycursor.execute(query)
+        self.mycursor.execute(query)
 
         try:
-            return mycursor.fetchall()
+            return self.mycursor.fetchall()
         except:
             return

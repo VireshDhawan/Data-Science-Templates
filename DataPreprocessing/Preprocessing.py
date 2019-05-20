@@ -3,8 +3,9 @@ import os
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer as Imputer
-
+from sklearn.preprocessing import StandardScaler as scaler
 from Utils.database import Database
+from sklearn.model_selection import train_test_split
 
 
 class DataPreprocess:
@@ -44,8 +45,8 @@ class DataPreprocess:
         self.df = pd.read_csv(self.input_file)
         print('Step 1 - File Read Complete ...')
 
-        if (self.is_load_into_sql):
-            self.insert_data_into_sql()
+        # if (self.is_load_into_sql):
+        #     self.insert_data_into_sql()
 
         # Get All training Columns
         self.get_training_columns(self.df)
@@ -63,7 +64,16 @@ class DataPreprocess:
         self.get_categorical_columns()
         print('Step 2 - Categorical Column Identification Complete ...')
 
-        self.x_train = pd.get_dummies(self.x_train, columns=self.categorical_columns)
+        self.x_train = pd.get_dummies(self.x_train, columns=self.categorical_columns, prefix='one_hot_encoded_')
+        self.get_training_columns(self.x_train)
+        # Hotfix for XGBoost
+        for column in self.traincols:
+            if ("<" in column):
+                self.x_train.rename(index=str, columns={column: column.replace("<", "")}, inplace=True)
+        self.get_training_columns(self.x_train)
+        encoded_columns = [i for i in self.traincols if "one_hot_encoded_" in i][:-1]
+        not_encoded_columns = [i for i in self.traincols if "one_hot_encoded_" not in i]
+        self.x_train = self.x_train[self.union(encoded_columns, not_encoded_columns)]
         self.get_training_columns(self.x_train)
         print('Step 3 - One Hot Encoding Complete ...')
 
@@ -71,10 +81,26 @@ class DataPreprocess:
         imputer = Imputer(strategy='mean', copy=False)
         self.x_train = pd.DataFrame(data=imputer.fit_transform(self.x_train), columns=self.traincols)
         print('Step 4 - Null Value Imputation Complete ...')
+
+        # Step 3 - Feature Scaling
+        sc_X = scaler(copy=False)
+        self.x_train[not_encoded_columns] = sc_X.fit_transform(self.x_train[not_encoded_columns])
+        print('Step 5 - Standardisation Complete ...')
+
+        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x_train, self.y_train, test_size=0.2, random_state=1)
+        print('Step 5 - Train Test Splitting Complete ...')
+
         print('Shape:' + str(self.x_train.shape))
 
+        return self.df, self.x_train, self.y_train, self.x_test, self.y_test, self.traincols, self.categorical_columns
 
-        return self.df, self.x_train, self.y_train, self.traincols, self.categorical_columns
+    def union(self, lst1, lst2):
+        final_list = list(set(lst1) | set(lst2))
+        return final_list
+
+    def diff(self, first, second):
+        second = set(second)
+        return [item for item in first if item not in second]
 
     def get_training_columns(self, dataframe):
 

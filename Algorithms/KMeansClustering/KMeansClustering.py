@@ -1,5 +1,6 @@
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
+import numpy as np
 
 
 class KMeansClustering:
@@ -25,7 +26,7 @@ class KMeansClustering:
     def show_cross_val_score(self):
         cv_score = cross_val_score(estimator=self.clf, X=self.x_train, y=self.y_train, cv=self.cv, n_jobs=-1)
         print('KMeans Cross Validated Score...')
-        print(cv_score)
+        print(np.mean(cv_score))
         print('\n')
 
     def optimise(self):
