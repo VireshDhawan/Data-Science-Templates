@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer as Imputer
-from sklearn.preprocessing import StandardScaler as scaler
+from sklearn.preprocessing import RobustScaler as scaler
 from Utils.database import Database
 from sklearn.model_selection import train_test_split
 

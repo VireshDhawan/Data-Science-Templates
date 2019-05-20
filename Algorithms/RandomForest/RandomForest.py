@@ -22,7 +22,7 @@ class RandomForest:
 
 
     def show_cross_val_score(self):
-        cv_score = cross_val_score(estimator=self.clf, X=self.x_train, y=self.y_train, cv=self.cv, n_jobs=-1)
+        cv_score = cross_val_score(estimator=self.clf, X=self.x_train, y=self.y_train, cv=self.cv, n_jobs=-1, scoring='accuracy')
         print('Random Forest Cross Validated Score...')
         print(np.mean(cv_score))
         print('\n')
